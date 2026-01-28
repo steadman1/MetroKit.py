@@ -7,10 +7,18 @@ sys.path.append(absolute_path)
 from Line import Line
 from Point import Point
 
-class Station:
+class Vertex:
     def __init__(self, location: Point) -> None:
-        self.lines = []
-        self.location = location
+        self.lines: list[Line] = []
+        self.location: Point = location
     
     def add_line(self, line: Line):
         pass
+
+# visible vertex
+class Station(Vertex):
+    pass
+
+# invisible vertex at corners or created by gestures
+class Anchor(Vertex):
+    pass
