@@ -1,12 +1,7 @@
-import os
-import sys
-
-absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-sys.path.append(absolute_path)
-
 from Direction import Direction
 from Point import Point
 
+# a single edge between two vertices
 class Edge:
     def __init__(self, start: Point, end: Point) -> None:
         if start.y == end.y:
@@ -19,10 +14,3 @@ class Edge:
             self.direction = Direction.NORTH_EAST_BI
         else:
             raise Exception("Invalid edge start, end pair")
-        
-
-class Line:
-    def __init__(self, start: Point, end: Point) -> None:
-        self.anchors = []
-        self.start = start
-        self.end = end
