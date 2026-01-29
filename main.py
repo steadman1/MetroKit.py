@@ -2,7 +2,7 @@ import svgwrite
 
 from Classes.Edges import Line
 from Classes.Point import Point
-from Classes.Vertices import Station
+from Classes.Vertices import Vertex
 
 GRID_SIZE: tuple[int, int] = (100, 100)
 CELL_SIZE: int = 50
