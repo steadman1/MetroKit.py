@@ -1,5 +1,6 @@
 import os
 import sys
+from math import floor
 from enum import Enum, auto
 from typing import TYPE_CHECKING
 
@@ -18,20 +19,27 @@ class VertexType(Enum):
     CORNER = auto() # a vertex on the grid where incoming lines 
 
 class Vertex:
-    def __init__(self, type: VertexType, location: Point, lines: list['Line'] = []) -> None:
+    def __init__(self, type: VertexType, location: Point, edges: list['Edge'] = []) -> None:
         self.type: VertexType = type
-        self.lines: list['Line'] = lines
+        self.edges: list['Edge'] = edges
         self.location: Point = location
         
         # check if there's more than just incoming and outgoing lines, might want the ability to have more than 2 at some point but not rn
-        if len(self.lines) > 2:
+        if len(self.edges) > 2:
             raise Exception("Vertices should not have more than 2 associated lines.")
     
     def __str__(self) -> str:
         return f"{self.type.name}: ({self.location.x}, {self.location.y})"
     
-    def add_line(self, line: 'Line'):
-        self.lines.append(line)
+    def add_edge(self, edge: 'Edge'):
+        self.edges.append(edge)
     
-    def remove_line(self, line: 'Line'):
-        self.lines.remove(line)
+    def remove_edge(self, edge: 'Edge'):
+        self.edges.remove(edge)
+    
+    def get_radius(self) -> int:
+        edge_lengths: list[float] = list( map( lambda x: x.get_length(), self.edges ) )
+        return min(
+            floor( min( edge_lengths ) ),
+            4
+        )

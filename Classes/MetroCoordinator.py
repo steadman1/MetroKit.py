@@ -10,8 +10,8 @@ from Edge import Edge
 from Vertex import Vertex
 from Lines import Line, Segment
    
-MIN_LINE_COUNT = 2
-MAX_LINE_COUNT = 2
+MIN_LINE_COUNT = 4
+MAX_LINE_COUNT = 4
 
 # create stations given (or not given) location
 # ^ use PCA or MDS to place points given a similarity vector
