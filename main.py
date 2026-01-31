@@ -6,7 +6,7 @@ from Classes.Vertex import Vertex, VertexType
 from random import sample
 
 GRID_SIZE: tuple[int, int] = (16, 16)
-CELL_SIZE: int = 40
+CELL_SIZE: int = 32
 
 def get_predefined_stations_placements() -> list[Vertex]:
     return [

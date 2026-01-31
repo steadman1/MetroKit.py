@@ -37,7 +37,7 @@ class Renderer:
         
         self.GRID_SIZE: tuple[int, int] = GRID_SIZE
         self.CELL_SIZE: int = CELL_SIZE
-        self.PADDING: int = 0
+        self.PADDING: int = 10
     
     def _get_color(self, index: int) -> str:
         if index < len(COLORS):
