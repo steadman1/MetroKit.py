@@ -15,10 +15,8 @@ if __name__ in "__main__":
     coordinator = MetroCoordinator(stations)
     renderer = Renderer(GRID_SIZE=GRID_SIZE, CELL_SIZE=CELL_SIZE)
     
-    clusters: list[list[Vertex]] = coordinator._get_clusters(stations, 6)
-    for (index, cluster) in enumerate(clusters):
-        edges = coordinator._prims_mst(cluster)
-    
-        renderer.draw_graph(stations, edges, filename=f"cluster_{index}_mst.svg")
+    coordinator.populate_lines()
+    for (index, line) in enumerate(coordinator.lines):
+        renderer.draw_graph(line, filename=f"cluster_{index}_mst.svg")
     
     

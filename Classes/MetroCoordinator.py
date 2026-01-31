@@ -2,8 +2,6 @@ import os
 import sys
 from math import sin, ceil
 from random import choice
-import heapq
-from typing import TYPE_CHECKING
 
 absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(absolute_path)
@@ -95,11 +93,14 @@ class MetroCoordinator:
             clusters: list[list[Vertex]] = self._get_clusters(self.stations, line_count)
             
             # build min. spanning tree for each cluster
-            print([ list((str(vertex) for vertex in cluster)) for cluster in clusters])
             for cluster in clusters:
+                line = Line(cluster)
                 mst = self._prims_mst(cluster)
-                print([ str(edge) for edge in mst])
-            
+                for edge in mst:
+                    line.add_segment(Segment(edge))
+                
+                self.lines.append(line)
+                
             # calculate weight of adjacencies based on distance, angle of vertices, etc.
             pass 
             
