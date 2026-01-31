@@ -39,9 +39,14 @@ class Renderer:
         self.CELL_SIZE: int = CELL_SIZE
         self.PADDING: int = 50
     
+    def _get_color(self, index: int) -> str:
+        if index < len(COLORS):
+            return COLORS[index]
+            
+        return "#000000"
+    
     def _get_cell_pos(self, x: int, y: int) -> tuple[float, float]:
         return (x * self.CELL_SIZE / 2 + self.PADDING, y * self.CELL_SIZE / 2 + self.PADDING)
-    
     
     def _draw_rounded_corner(self, drawing: svgwrite.Drawing, p0: tuple, p1: tuple, radius: float, sweep_flag: int, color: str = 'red'):
         """Renders the SVG arc based on pre-calculated tangent points and flags."""
@@ -115,7 +120,7 @@ class Renderer:
     
         # draw all edges for all stations
         for index, line in enumerate(lines):
-            hex_color = COLORS[index]
+            hex_color = self._get_color(index)
             # 1. Draw Edges first so they appear behind vertices
             for segment in line.segments:
                 for corner in segment.vertices:
@@ -135,7 +140,7 @@ class Renderer:
             
         # draw all stations for all lines
         for index, line in enumerate(lines):
-            hex_color = COLORS[index]
+            hex_color = self._get_color(index)
             # 2. Draw Vertices
             for vertex in line.stations:
                 pos = self._get_cell_pos(vertex.location.x, vertex.location.y)

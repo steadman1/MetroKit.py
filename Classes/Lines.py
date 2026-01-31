@@ -1,6 +1,7 @@
 import os
 import sys
 import math
+from tabnanny import verbose
 from typing import Optional
 
 absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
@@ -14,13 +15,19 @@ from Vertex import Vertex
 
 # the edges and vertices (that are not stations !!) between two stations
 class Segment:
-    def __init__(self, edge: Edge) -> None:
-        self.vertices: list[Vertex] = []
+    def __init__(self, edge: Edge, stations: list[Vertex]) -> None:
+        self.stations: list[Vertex] = stations
+        self.vertices: list[Vertex] = [] # non station vertices
         
         corner, edges = self.split_edge(edge)
         self.edges: list[Edge] = edges
         if corner:
             self.vertices += [corner]
+    
+    @classmethod
+    def from_stations(cls, s1: Vertex, s2: Vertex):
+        edge = Edge(s1.location, s2.location)
+        return cls(edge, [s1, s2])
     
     def split_edge(self, edge: Edge) -> tuple[Optional[Vertex], list[Edge]]:
         if edge.direction.value != Direction.UNKNOWN.value:
@@ -95,3 +102,7 @@ class Line:
         
     def add_segment(self, segment: Segment):
         self.segments.append(segment)
+        for vertex in segment.stations:
+            if vertex.type.value == VertexType.STATION.value and vertex not in self.stations:
+                self.stations.append(vertex)
+                

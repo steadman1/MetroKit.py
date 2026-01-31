@@ -5,8 +5,8 @@ from Classes.Vertex import Vertex, VertexType
 
 from random import sample
 
-GRID_SIZE: tuple[int, int] = (100, 100)
-CELL_SIZE: int = 16
+GRID_SIZE: tuple[int, int] = (16, 16)
+CELL_SIZE: int = 40
 
 def get_predefined_stations_placements() -> list[Vertex]:
     return [
@@ -24,7 +24,7 @@ def get_random_station_placements(count: int) -> list[Vertex]:
     return sample(list(grid), count)
 
 if __name__ in "__main__":
-    stations = get_random_station_placements(100)
+    stations = get_random_station_placements(12)
     # stations = get_predefined_stations_placements()
     
     coordinator = MetroCoordinator(stations)
