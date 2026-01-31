@@ -1,14 +1,12 @@
 import os
 import sys
 from math import sqrt, atan2
-from typing import TYPE_CHECKING
 
 absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(absolute_path)
 
-if TYPE_CHECKING:
-    from Direction import Direction
-    from Point import Point
+from Direction import Direction
+from Point import Point
 
 # a single edge between two vertices
 class Edge:
@@ -25,7 +23,11 @@ class Edge:
         elif (end.x - start.x) == -(end.y - start.y):
             self.direction = Direction.NORTH_EAST_BI
         else:
-            raise Exception("Invalid edge start, end pair")
+            self.direction = Direction.UNKNOWN
+            # raise Exception("Invalid edge start, end pair")
+    
+    def __str__(self) -> str:
+        return f"({self.start.x}, {self.start.y})->({self.end.x}, {self.end.y}), len: {self.get_length()}, angle: {self.get_angle_rad()}"
     
     def get_direction(self) -> Direction:
         return self.direction

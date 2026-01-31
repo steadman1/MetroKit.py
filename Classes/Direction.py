@@ -1,6 +1,8 @@
 from enum import Enum, auto
 
 class Direction(Enum):
+    UNKNOWN = auto()
+    
     # bi-directional
     NORTH_SOUTH_BI = auto()
     WEST_EAST_BI = auto()

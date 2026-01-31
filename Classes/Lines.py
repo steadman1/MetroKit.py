@@ -5,8 +5,9 @@ from typing import TYPE_CHECKING
 absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(absolute_path)
 
+from Edge import Edge
+
 if TYPE_CHECKING:
-    from Edge import Edge
     from Vertex import Vertex
 
 # the edges and vertices (that are not stations !!) between two stations
