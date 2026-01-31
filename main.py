@@ -3,10 +3,10 @@ from Classes.Point import Point
 from Classes.Renderer import Renderer
 from Classes.Vertex import Vertex, VertexType
 
-from random import sample
+from random import seed, sample
 
 GRID_SIZE: tuple[int, int] = (16, 16)
-CELL_SIZE: int = 32
+CELL_SIZE: int = 50
 
 def get_predefined_stations_placements() -> list[Vertex]:
     return [
@@ -15,16 +15,24 @@ def get_predefined_stations_placements() -> list[Vertex]:
         
         Vertex(VertexType.STATION, Point(10, 4)),
         Vertex(VertexType.STATION, Point(12, 1)),
+        
+        Vertex(VertexType.STATION, Point(16, 10)),
+        Vertex(VertexType.STATION, Point(4, 12)),
     ]
 
-def get_random_station_placements(count: int) -> list[Vertex]:
-    grid = set([ 
-        Vertex(VertexType.STATION, Point(x, y)) for x in range(GRID_SIZE[0]) for y in range(GRID_SIZE[1]) 
-    ])
+def get_random_station_placements(count: int, use_seed: bool = True) -> list[Vertex]:
+    grid = [ 
+        Vertex(VertexType.STATION, Point(x, y)) 
+        for x in range(GRID_SIZE[0]) 
+        for y in range(GRID_SIZE[1]) 
+    ]
+    
+    if use_seed:
+        seed(0)
     return sample(list(grid), count)
 
 if __name__ in "__main__":
-    stations = get_random_station_placements(12)
+    stations = get_random_station_placements(24)
     # stations = get_predefined_stations_placements()
     
     coordinator = MetroCoordinator(stations)

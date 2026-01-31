@@ -1,7 +1,7 @@
 import os
 import sys
 from math import sin, ceil
-from random import choice
+from random import sample, choice
 
 absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(absolute_path)
@@ -11,7 +11,7 @@ from Vertex import Vertex
 from Lines import Line, Segment
 from Point import Point
    
-MIN_LINE_COUNT = 1
+MIN_LINE_COUNT = 2
 MAX_LINE_COUNT = 8
 
 # create stations given (or not given) location
@@ -26,20 +26,41 @@ class MetroCoordinator:
         self.stations: list[Vertex] = stations
         self.lines: list[Line] = []
     
-    # randomly selecting vertices to generate clusters
-    # TODO: change to k-mean clustering or another algo (?)
-    def _get_clusters(self, vertices: list[Vertex], cluster_count: int) -> list[list[Vertex]]:
-        max_capacity = ceil(len(vertices) / cluster_count)
-        clusters: list[list[Vertex]] = [ [] for _ in range(cluster_count) ]
+    # generate clusters using k-mean 
+    def _get_clusters(self, vertices: list[Vertex], cluster_count: int, iterations: int = 10) -> list[list[Vertex]]:
+        if not vertices or cluster_count <= 0:
+            return []
+        if cluster_count >= len(vertices):
+            return [[v] for v in vertices]
+    
+        centroids = [v.location for v in sample(vertices, cluster_count)]
         
-        for vertex in vertices:
-            cluster_index_choices = [
-                x for x in range(cluster_count) 
-                if len(clusters[x]) < max_capacity
-            ]
-            cluster_index = choice(cluster_index_choices)
-            clusters[cluster_index].append(vertex)
-            
+        clusters: list[list[Vertex]] = [[] for _ in range(cluster_count)]
+    
+        for _ in range(iterations):
+            clusters = [[] for _ in range(cluster_count)]
+    
+            for vertex in vertices:
+                best_centroid_idx = 0
+                min_cost = float('inf')
+                
+                for i, centroid_loc in enumerate(centroids):
+                    cost = self._edge_cost(vertex.location, centroid_loc)
+                    if cost < min_cost:
+                        min_cost = cost
+                        best_centroid_idx = i
+                
+                clusters[best_centroid_idx].append(vertex)
+    
+            for i in range(cluster_count):
+                if not clusters[i]:
+                    centroids[i] = choice(vertices).location
+                    continue
+                
+                avg_x = sum(v.location.x for v in clusters[i]) / len(clusters[i])
+                avg_y = sum(v.location.y for v in clusters[i]) / len(clusters[i])
+                centroids[i] = Point(avg_x, avg_y)
+    
         return clusters
         
     # define costs for each line
