@@ -26,6 +26,12 @@ class MetroCoordinator:
         self.stations: list[Vertex] = stations
         self.lines: list[Line] = []
     
+    @classmethod
+    def from_lines(cls, stations: list[Vertex], lines: list[Line]):
+        coordinator = cls(stations)
+        coordinator.lines = lines
+        return coordinator
+    
     # generate clusters using k-mean 
     def _get_clusters(self, vertices: list[Vertex], cluster_count: int, iterations: int = 10) -> list[list[Vertex]]:
         if not vertices or cluster_count <= 0:

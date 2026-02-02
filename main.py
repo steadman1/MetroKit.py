@@ -2,11 +2,12 @@ from Classes.MetroCoordinator import MetroCoordinator
 from Classes.Point import Point
 from Classes.Renderer import Renderer
 from Classes.Vertex import Vertex, VertexType
+from Classes.Lines import Line, Segment
 
 from random import seed, sample
 
 GRID_SIZE: tuple[int, int] = (16, 16)
-CELL_SIZE: int = 50
+CELL_SIZE: int = 40
 
 def get_predefined_stations_placements() -> list[Vertex]:
     return [

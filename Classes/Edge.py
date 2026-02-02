@@ -26,8 +26,15 @@ class Edge:
             self.direction = Direction.UNKNOWN
             # raise Exception("Invalid edge start, end pair")
     
+    def __eq__(self, other) -> bool:
+        return self.start == other.start and self.end == other.end
+    
     def __str__(self) -> str:
         return f"({self.start.x}, {self.start.y})->({self.end.x}, {self.end.y}), len: {self.get_length()}, angle: {self.get_angle_rad()}"
+    
+    def trim_length(self, trim_amount: float, ) -> None:
+        # using direction, and/or start, end positions subtract from start.x, start.y or end.x, end.y
+        pass
     
     def get_direction(self) -> Direction:
         return self.direction

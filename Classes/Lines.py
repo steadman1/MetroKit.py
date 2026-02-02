@@ -7,17 +7,15 @@ from typing import Optional
 absolute_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 sys.path.append(absolute_path)
 
-from Classes.Vertex import VertexType
 from Edge import Edge
 from Point import Point
 from Direction import Direction
-from Vertex import Vertex
+from Vertex import Vertex, VertexType
 
 # the edges and vertices (that are not stations !!) between two stations
 class Segment:
-    def __init__(self, edge: Edge, stations: list[Vertex]) -> None:
-        self.stations: list[Vertex] = stations
-        self.vertices: list[Vertex] = [] # non station vertices
+    def __init__(self, edge: Edge, vertices: list[Vertex], split_edge: bool = True) -> None:
+        self.vertices: list[Vertex] = vertices
         
         corner, edges = self.split_edge(edge)
         self.edges: list[Edge] = edges
@@ -28,6 +26,9 @@ class Segment:
     def from_stations(cls, s1: Vertex, s2: Vertex):
         edge = Edge(s1.location, s2.location)
         return cls(edge, [s1, s2])
+    
+    def get_vertices(self, type: VertexType) -> list[Vertex]:
+        return list( filter( lambda x: x.type.value == type.value, self.vertices ) )
     
     def split_edge(self, edge: Edge) -> tuple[Optional[Vertex], list[Edge]]:
         if edge.direction.value != Direction.UNKNOWN.value:
@@ -58,14 +59,15 @@ class Segment:
         trimmed_edges: list[Edge] = []
         
         for edge in self.edges:
+            corners = self.get_vertices(VertexType.CORNER)
             # Determine the radius to trim at the start
             # Find if there's a vertex at the start point
-            start_vertex = next((v for v in self.vertices if v.location == edge.start), None)
+            start_vertex = next((v for v in corners if v.location == edge.start), None)
             r_start = start_vertex.get_radius() if start_vertex else 0
             
             # Determine the radius to trim at the end
             # Find if there's a vertex at the end point
-            end_vertex = next((v for v in self.vertices if v.location == edge.end), None)
+            end_vertex = next((v for v in corners if v.location == edge.end), None)
             r_end = end_vertex.get_radius() if end_vertex else 0
             
             # Calculate the unit vector for the edge direction
@@ -102,7 +104,7 @@ class Line:
         
     def add_segment(self, segment: Segment):
         self.segments.append(segment)
-        for vertex in segment.stations:
+        for vertex in segment.vertices:
             if vertex.type.value == VertexType.STATION.value and vertex not in self.stations:
                 self.stations.append(vertex)
                 
