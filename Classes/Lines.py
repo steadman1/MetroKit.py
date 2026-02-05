@@ -31,8 +31,9 @@ class Segment:
         return list( filter( lambda x: x.type.value == type.value, self.vertices ) )
     
     def split_edge(self, edge: Edge) -> tuple[Optional[Vertex], list[Edge]]:
-        if edge.direction.value != Direction.UNKNOWN.value:
-            return (None, [edge])
+        # draw diagonal lines
+        # if not edge.direction.is_cardinal():
+        #      return (None, [edge])
 
         # randomize if the split edge becomes a top left or bottom right anchor
         edges = [

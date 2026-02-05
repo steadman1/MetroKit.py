@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from tkinter.constants import TRUE
 
 class Direction(Enum):
     UNKNOWN = auto()
@@ -20,3 +21,17 @@ class Direction(Enum):
     WEST_NORTH = auto()
     NORTH_EAST = auto()
     EAST_NORTH = auto()
+    
+    def is_cardinal(self):
+        match self.value:
+         case Direction.NORTH_WEST_BI.value | \
+                Direction.NORTH_EAST_BI.value | \
+                Direction.NORTH_WEST.value | \
+                Direction.NORTH_EAST.value | \
+                Direction.WEST_NORTH.value | \
+                Direction.EAST_NORTH.value | \
+                Direction.UNKNOWN:
+            return False 
+        
+        return True
+             
