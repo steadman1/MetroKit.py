@@ -8,4 +8,4 @@ This version (the Python MVP) uses `svgwrite` to render the graph; however, I'm 
 
 Only part of the graph is displayed on GitHub, not sure why. Download the svg if you want to view the whole thing!
 
-![most recently rendered SVG of metro themed graph](svgs/cluster_mst.svg)
+<img src="svgs/cluster_mst.svg" alt="most recently rendered SVG of metro themed graph" width="2048" height="2048">
