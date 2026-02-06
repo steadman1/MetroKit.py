@@ -6,6 +6,6 @@ This version (the Python MVP) uses `svgwrite` to render the graph; however, I'm 
 
 ## Most Recent Graph Rendering
 
-Only part of the graph is displayed on GitHub, not sure why. Download the svg if you want to view the whole thing!
+Only part of the graph may displayed on GitHub. Download the svg from the svgs dir if you want to view the whole thing!
 
 <img src="svgs/cluster_mst.svg" alt="most recently rendered SVG of metro themed graph" width="2048" height="2048">
