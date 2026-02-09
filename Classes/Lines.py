@@ -14,17 +14,27 @@ from Vertex import Vertex, VertexType
 
 # the edges and vertices (that are not stations !!) between two stations
 class Segment:
-    def __init__(self, edge: Edge, vertices: list[Vertex], split_edge: bool = True) -> None:
+    def __init__(
+        self, 
+        edge: Edge, 
+        vertices: list[Vertex], 
+        split_edge: bool = True
+    ) -> None:
         self.vertices: list[Vertex] = vertices
         
-        corner, edges = self.split_edge(edge)
-        self.edges: list[Edge] = edges
-        if corner:
-            self.vertices += [corner]
+        if split_edge:
+            corner, edges = self.split_edge(edge)
+            self.edges: list[Edge] = edges
+            if corner:
+                self.vertices += [corner]
+        else:
+            self.edges = [edge]
     
     @classmethod
     def from_stations(cls, s1: Vertex, s2: Vertex):
         edge = Edge(s1.location, s2.location)
+        # s1.add_edge(edge)
+        # s2.add_edge(edge)
         return cls(edge, [s1, s2])
     
     def get_vertices(self, type: VertexType) -> list[Vertex]:
@@ -96,6 +106,12 @@ class Segment:
             trimmed_edges.append(Edge(new_start, new_end))
             
         return trimmed_edges
+    
+    # assuming that outgoing always means the last edge in self.edges
+    def get_outgoing_direction(self) -> Direction:
+        if len(self.edges) > 0:
+            return self.edges[-1].direction
+        return Direction.UNKNOWN
 
 # a metro line with stations and segments
 class Line:

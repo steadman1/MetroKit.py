@@ -7,7 +7,8 @@ from Classes.Lines import Line, Segment
 from random import seed, sample
 
 GRID_SIZE: tuple[int, int] = (16, 16)
-CELL_SIZE: int = 40
+CELL_SIZE: int = 60
+LINE_COUNT: int = 3
 
 def get_predefined_stations_placements() -> list[Vertex]:
     return [
@@ -36,10 +37,13 @@ if __name__ in "__main__":
     stations = get_random_station_placements(24)
     # stations = get_predefined_stations_placements()
     
-    coordinator = MetroCoordinator(stations)
+    coordinator = MetroCoordinator(stations, GRID_SIZE=GRID_SIZE, LINE_COUNT=LINE_COUNT)
     renderer = Renderer(GRID_SIZE=GRID_SIZE, CELL_SIZE=CELL_SIZE)
     
-    coordinator.populate_lines()
+    coordinator.populate_lines(0)
     renderer.draw_metro(coordinator.lines, filename="cluster_mst.svg")
+    
+    coordinator.populate_lines(1)
+    renderer.draw_metro(coordinator.lines, filename="cluster_mst_magnetic.svg")
     
     

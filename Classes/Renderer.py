@@ -126,6 +126,7 @@ class Renderer:
                 for corner in segment.vertices:
                     self.draw_corner(dwg, corner, hex_color)
                     
+                    
                 for edge in segment.get_trimmed_edges():
                     
                     start_coords = self._get_cell_pos(edge.start.x, edge.start.y)

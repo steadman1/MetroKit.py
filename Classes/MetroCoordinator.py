@@ -10,9 +10,7 @@ from Edge import Edge
 from Vertex import Vertex
 from Lines import Line, Segment
 from Point import Point
-   
-MIN_LINE_COUNT = 2
-MAX_LINE_COUNT = 8
+from MagnetismPathfinder import MagnetismPathfinder
 
 # create stations given (or not given) location
 # ^ use PCA or MDS to place points given a similarity vector
@@ -22,13 +20,27 @@ MAX_LINE_COUNT = 8
 # 
 class MetroCoordinator:
     # populate stations based on 
-    def __init__(self, stations: list[Vertex]) -> None:
+    def __init__(
+        self, 
+        stations: list[Vertex], 
+        GRID_SIZE: tuple[int, int],
+        LINE_COUNT: int = 6
+    ) -> None:
         self.stations: list[Vertex] = stations
         self.lines: list[Line] = []
+        
+        self.GRID_SIZE = GRID_SIZE
+        self.LINE_COUNT = LINE_COUNT
     
     @classmethod
-    def from_lines(cls, stations: list[Vertex], lines: list[Line]):
-        coordinator = cls(stations)
+    def from_lines(
+        cls, 
+        stations: list[Vertex], 
+        lines: list[Line],
+        GRID_SIZE: tuple[int, int],
+        LINE_COUNT: int
+    ):
+        coordinator = cls(stations, GRID_SIZE, LINE_COUNT)
         coordinator.lines = lines
         return coordinator
     
@@ -102,8 +114,8 @@ class MetroCoordinator:
     
             in_mst[u] = True
             if parent[u] != -1:
-                segments = Segment.from_stations(vertices[parent[u]], vertices[u])
-                mst_segments.append(segments)
+                segment = Segment.from_stations(vertices[parent[u]], vertices[u])
+                mst_segments.append(segment)
     
             for v in range(vertex_count):
                 if not in_mst[v]:
@@ -152,39 +164,72 @@ class MetroCoordinator:
 
         return closest_station
     
-    def populate_lines(self):            
-        best_efficiency = float('inf')
-        # iteratively determine best line count based on some efficiency score
-        for line_count in range(MIN_LINE_COUNT, min(MAX_LINE_COUNT + 1, len(self.stations) + 1)):
-            # cluster stations (where each cluster is a metro line)
-            clusters: list[list[Vertex]] = self._get_clusters(self.stations, line_count)
+    def populate_lines(self, magnetism: float):           
+        clusters: list[list[Vertex]] = self._get_clusters(self.stations, self.LINE_COUNT)
+        
+        global_edges: list[Edge] = []
+        lines: list[Line] = []
+        # build min. spanning tree for each cluster
+        for cluster in clusters:
+            line = Line(cluster)
+            mst = self._prims_mst(cluster)
             
-            lines: list[Line] = []
-            # build min. spanning tree for each cluster
-            for cluster in clusters:
-                line = Line(cluster)
-                mst = self._prims_mst(cluster)
-                for segment in mst:
-                    line.add_segment(segment)
+            for segment_template in mst:
+                p_start = segment_template.edges[0].start
+                p_end = segment_template.edges[-1].end
+
+                # 1. Calculate Path
+                pathfinder = MagnetismPathfinder(global_edges, self.GRID_SIZE)
+                path_points = pathfinder.find_path(p_start, p_end, magnetism)
                 
-                lines.append(line)
+                # 2. Process Path into Graph Primitives
+                new_edges, new_corners = MagnetismPathfinder.process_path_into_segment_data(path_points)
+                
+                # 3. Add to Global Environment (so next lines stick to these)
+                global_edges.extend(new_edges)
+
+                # 4. Create the Segment
+                # We pass the edges and the explicitly created corner vertices.
+                # We set split_edge=False because we have manually defined the geometry.
+                
+                # Note: Segment expects a list of edges. If your Segment class is strictly 
+                # one edge (as per original code), you may need to add multiple Segments.
+                # However, assuming we modified Segment to hold a chain of edges:
+                
+                # Case A: Segment supports multiple edges (Recommended Refactor)
+                # new_segment = Segment(new_edges, vertices=new_corners, split_edge=False)
+                # line.add_segment(new_segment)
+
+                # Case B: One Segment per Edge (Strict adherence to original Segment class)
+                # This is safer if you haven't refactored Segment yet.
+                # We treat the path as a chain of segments.
+                for i, edge in enumerate(new_edges):
+                    # Find if this edge connects to a corner we just created
+                    # The start of this edge might be a corner from the previous iteration
+                    start_v = next((c for c in new_corners if c.location == edge.start), None)
+                    end_v = next((c for c in new_corners if c.location == edge.end), None)
+                    
+                    verts = []
+                    if start_v: verts.append(start_v)
+                    if end_v: verts.append(end_v)
+                    
+                    # We pass the specific edge and its associated corners
+                    seg = Segment(edge, vertices=verts, split_edge=False)
+                    line.add_segment(seg)
             
-            current_efficiency = self._calculate_lines_efficiency(lines)
-            if current_efficiency < best_efficiency:
-                best_efficiency = current_efficiency
-                self.lines = lines
+            lines.append(line)
+        
+        self.lines = lines
             
-        # calculate weight of adjacencies based on distance, angle of vertices, etc.
-        # 
         # connect lines together
         # todo: ensure graph becomes fully connected, currently its not guarenteed
-        for line in self.lines:
-            if not line.stations:
-                continue
+        # for line in self.lines:
+        #     if not line.stations:
+        #         continue
                 
-            start = line.stations[0]
-            end = self._get_closest_unconnected_station(start)
-            line.add_segment(Segment.from_stations(start, end))
+        #     start = line.stations[0]
+        #     end = self._get_closest_unconnected_station(start)
+        #     line.add_segment(Segment.from_stations(start, end))
             
         # determine most efficient graph based on total weight of graph
         # check for large edge lengths
